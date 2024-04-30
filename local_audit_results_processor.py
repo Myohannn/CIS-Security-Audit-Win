@@ -6,6 +6,8 @@ import sys
 
 from openpyxl import load_workbook
 
+from bs4 import UnicodeDammit
+
 from utilities.getPwdPolicy import compare_pwd_policy_local
 from utilities.getRegValue import compare_reg_value_local
 from utilities.getLockoutPolicy import compare_lockout_policy_local
@@ -251,7 +253,13 @@ if __name__ == '__main__':
     result_fname = args.ps_result
 
     output_list = []
-    with open(result_fname, 'r', encoding='utf-16') as file:
+    
+    # use UnicodeDammit to detect the file encoding, varies between Windows PowerShell and PowerShell
+    with open(result_fname,'rb') as file:
+        detect = file.read(4)
+        encoding = UnicodeDammit(detect).original_encoding
+
+    with open(result_fname, 'r', encoding=encoding) as file:
         lines = file.readlines()
 
     single_line = ' '.join(line.strip() for line in lines)

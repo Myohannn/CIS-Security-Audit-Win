@@ -344,7 +344,7 @@ if __name__ == '__main__':
         my_parser.print_help()
         sys.exit(1)
 
-    print('Aduit file:', args.audit)
+    print('Audit file:', args.audit)
 
     # fname = "src\Audit\CIS_MS_Windows_11_Enterprise_Level_1_v1.0.0.xlsx"
     fname = args.audit

@@ -367,4 +367,4 @@ if __name__ == '__main__':
             f.write(";")
             # print(cmd)
 
-    print("Done! File saved: %s", script_name)
+    print("Done! File saved:", script_name)

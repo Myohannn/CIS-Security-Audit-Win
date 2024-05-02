@@ -22,6 +22,7 @@ regexes = {
 
 # The dictionary maps different audit categories
 data_dict = {
+    "METADATA": {},
     "PASSWORD_POLICY": [],
     "REGISTRY_SETTING": [],
     "LOCKOUT_POLICY": [],
@@ -64,6 +65,13 @@ def find_element(audit: str) -> None:
     '''
 
     soup = BeautifulSoup(audit, 'lxml')
+
+    # Capture the audit file metadata
+    metadata = soup.find('ui_metadata')
+    for key in ['display_name','type','name','version','link','labels','benchmark_refs']:
+        item = metadata.find(key)
+        if item:
+            data_dict['METADATA'][item.name] = item.text
 
     # Find all the custom_item elements
     items = soup.find_all('custom_item')
@@ -181,7 +189,10 @@ def output_file(out_fname):
     writer = pd.ExcelWriter(out_fname, engine='openpyxl')
 
     for type, data in data_dict.items():
-        df = pd.DataFrame(data, columns=['Checklist', 'Type', 'Index', 'Description', 'Solution',
+        if type == 'METADATA':
+            df = pd.DataFrame(data, index=['0',])
+        else:
+            df = pd.DataFrame(data, columns=['Checklist', 'Type', 'Index', 'Description', 'Solution',
                                          'Reg Key',  'Reg Item', 'Reg Option', 'Audit Policy Subcategory', 'Right type', 'Value Data'])
         df.to_excel(writer, sheet_name=type, index=False)
 
@@ -211,7 +222,7 @@ if __name__ == '__main__':
         my_parser.print_help()
         sys.exit(1)
 
-    print('Aduit file:', args.audit)
+    print('Audit file:', args.audit)
 
     # src_fname = 'src/CIS/CIS_MS_Windows_11_Enterprise_Level_1_v1.0.0.audit'
     # src_fname = 'src/CIS/CIS_Microsoft_Windows_Server_2019_Benchmark_v2.0.0_L1_DC.audit'

@@ -22,7 +22,7 @@ regexes = {
 
 # The dictionary maps different audit categories
 data_dict = {
-    "METADATA": [],
+    "METADATA": {},
     "PASSWORD_POLICY": [],
     "REGISTRY_SETTING": [],
     "LOCKOUT_POLICY": [],
@@ -71,7 +71,7 @@ def find_element(audit: str) -> None:
     for key in ['display_name','type','name','version','link','labels','benchmark_refs']:
         item = metadata.find(key)
         if item:
-            data_dict['METADATA'].append([item.name,item.text])
+            data_dict['METADATA'][item.name] = item.text
 
     # Find all the custom_item elements
     items = soup.find_all('custom_item')
@@ -190,7 +190,7 @@ def output_file(out_fname):
 
     for type, data in data_dict.items():
         if type == 'METADATA':
-            df = pd.DataFrame(data, columns=['Name','Value'])
+            df = pd.DataFrame(data, index=['0',])
         else:
             df = pd.DataFrame(data, columns=['Checklist', 'Type', 'Index', 'Description', 'Solution',
                                          'Reg Key',  'Reg Item', 'Reg Option', 'Audit Policy Subcategory', 'Right type', 'Value Data'])
